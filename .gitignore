@@ -1,0 +1,16 @@
+# Node modules
+node_modules/
+
+# Variables de entorno
+.env
+
+# Archivos de editores/IDE
+.vscode/
+.idea/
+
+# Archivos de compilación
+dist/
+build/
+
+# Dependencias locales de editor (por ejemplo, Visual Studio Code)
+.vscode/settings.json
