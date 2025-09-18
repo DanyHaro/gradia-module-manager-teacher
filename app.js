@@ -1,11 +1,11 @@
 // app.js
 const express = require('express');
 const cors = require('cors');
-const { testConnection } = require('./config/database');
+const { testConnection } = require('./src/config/database');
 
 // Importar rutas
-const cursoRoutes = require('./routes/cursoRoutes');
-const unidadRoutes = require('./routes/unidadRoutes');
+const cursoRoutes = require('./src/routes/cursoRoutes');
+const unidadRoutes = require('./src/routes/unidadRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
