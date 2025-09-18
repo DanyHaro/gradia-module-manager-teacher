@@ -1,33 +1,48 @@
-// src/models/Unidad.js
+// src/models/Actividad.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
-const Unidad = sequelize.define('Unidad', {
-  id_unidad: {
+const Actividad = sequelize.define('Actividad', {
+  id_actividad: {
     type: DataTypes.INTEGER,
     primaryKey: true,
     autoIncrement: true,
-    field: 'id_unidad'
+    field: 'id_actividad'
   },
-  titulo_unidad: {
+  nombre_actividad: {
     type: DataTypes.STRING(200),
     allowNull: false,
-    field: 'titulo_unidad'
+    field: 'nombre_actividad'
   },
   descripcion: {
     type: DataTypes.TEXT,
     allowNull: true,
     field: 'descripcion'
   },
-  numero_unidad: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    field: 'numero_unidad'
+  fecha_limite: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'fecha_limite'
   },
-  id_curso: {
+  tipo_actividad: {
+    type: DataTypes.ENUM('individual', 'grupal'),
+    allowNull: false,
+    field: 'tipo_actividad'
+  },
+  id_sesion: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    field: 'id_curso'
+    field: 'id_sesion'
+  },
+  id_usuario: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    field: 'id_usuario'
+  },
+  id_rubrica: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'id_rubrica'
   },
   created_at: {
     type: DataTypes.DATE,
@@ -42,10 +57,9 @@ const Unidad = sequelize.define('Unidad', {
     field: 'updated_at'
   }
 }, {
-  tableName: 'unidad',
-  schema: 'cursos',
+  tableName: 'actividad',
+  schema: 'actividades',
   timestamps: false
 });
 
-// Sin relaciones aquí
-module.exports = Unidad;
+module.exports = Actividad;

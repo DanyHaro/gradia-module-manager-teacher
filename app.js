@@ -3,9 +3,14 @@ const express = require('express');
 const cors = require('cors');
 const { testConnection } = require('./src/config/database');
 
+// 🔧 Importar relaciones ANTES que las rutas
+require('./src/models/associations');
+
 // Importar rutas
 const cursoRoutes = require('./src/routes/cursoRoutes');
 const unidadRoutes = require('./src/routes/unidadRoutes');
+const sesionRoutes = require('./src/routes/sesionRoutes');
+const actividadRoutes = require('./src/routes/actividadRoutes'); // Nueva ruta
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,15 +29,18 @@ app.use((req, res, next) => {
 // Rutas principales
 app.use('/api/cursos', cursoRoutes);
 app.use('/api/unidades', unidadRoutes);
+app.use('/api/sesiones', sesionRoutes);
+app.use('/api/actividades', actividadRoutes); // Nueva ruta
 
 // Ruta de prueba
 app.get('/', (req, res) => {
   res.json({
-    message: 'API de GradIA - Gestión de Cursos y Unidades',
+    message: 'API de GradIA - Gestión de Cursos, Unidades y Sesiones',
     version: '1.0.0',
     endpoints: {
       cursos: '/api/cursos',
-      unidades: '/api/unidades'
+      unidades: '/api/unidades',
+      sesiones: '/api/sesiones' // Nuevo endpoint
     }
   });
 });
@@ -40,7 +48,7 @@ app.get('/', (req, res) => {
 // Ruta para verificar la conexión a la base de datos
 app.get('/api/health', async (req, res) => {
   try {
-    await require('./config/database').authenticate();
+    await require('./src/config/database').authenticate();
     res.json({
       status: 'OK',
       database: 'Connected',
@@ -82,11 +90,11 @@ const startServer = async () => {
     
     // Iniciar servidor
     app.listen(PORT, () => {
-      console.log(`Servidor corriendo en el puerto ${PORT}`);
-      console.log(`Documentación disponible en http://localhost:${PORT}`);
+      console.log(` Servidor corriendo en el puerto ${PORT}`);
+      console.log(` Documentación disponible en http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('Error al iniciar el servidor:', error);
+    console.error(' Error al iniciar el servidor:', error);
     process.exit(1);
   }
 };

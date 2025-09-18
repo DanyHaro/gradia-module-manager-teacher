@@ -1,4 +1,4 @@
-// models/Curso.js
+// src/models/Curso.js
 const { DataTypes } = require('sequelize');
 const sequelize = require('../config/database');
 
@@ -48,4 +48,5 @@ const Curso = sequelize.define('Curso', {
   timestamps: false
 });
 
+// Sin relaciones aquí
 module.exports = Curso;
