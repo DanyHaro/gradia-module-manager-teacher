@@ -1,17 +1,31 @@
 {
-  "name": "gradia-manager-teacher",
+  "name": "gradia-module-manager-teacher",
   "version": "1.0.0",
-  "description": "Modulo de docente",
-  "main": "index.js",
+  "description": "API para gestión de cursos y unidades - GradIA",
+  "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js",
-    "dev": "nodemon app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "GRADIA GROUP",
+  "keywords": [
+    "nodejs",
+    "express",
+    "postgresql",
+    "sequelize",
+    "gradia"
+  ],
+  "author": "Tu nombre",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.1.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "pg": "^8.16.3",
+    "pg-hstore": "^2.3.4",
+    "sequelize": "^6.37.7"
+  },
+  "devDependencies": {
     "nodemon": "^3.1.10"
   }
 }
