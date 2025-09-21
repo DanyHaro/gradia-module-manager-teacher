@@ -10,7 +10,8 @@ require('./src/models/associations');
 const cursoRoutes = require('./src/routes/cursoRoutes');
 const unidadRoutes = require('./src/routes/unidadRoutes');
 const sesionRoutes = require('./src/routes/sesionRoutes');
-const actividadRoutes = require('./src/routes/actividadRoutes'); // Nueva ruta
+const actividadRoutes = require('./src/routes/actividadRoutes');
+const entregaRoutes = require('./src/routes/entregaRoutes'); //  Nueva ruta
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -30,7 +31,8 @@ app.use((req, res, next) => {
 app.use('/api/cursos', cursoRoutes);
 app.use('/api/unidades', unidadRoutes);
 app.use('/api/sesiones', sesionRoutes);
-app.use('/api/actividades', actividadRoutes); // Nueva ruta
+app.use('/api/actividades', actividadRoutes);
+app.use('/api/entregas', entregaRoutes); //  Nueva ruta
 
 // Ruta de prueba
 app.get('/', (req, res) => {
@@ -40,7 +42,7 @@ app.get('/', (req, res) => {
     endpoints: {
       cursos: '/api/cursos',
       unidades: '/api/unidades',
-      sesiones: '/api/sesiones' // Nuevo endpoint
+      sesiones: '/api/sesiones' //  Nuevo endpoint
     }
   });
 });

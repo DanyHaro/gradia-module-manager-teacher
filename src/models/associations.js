@@ -3,6 +3,8 @@ const Curso = require('./Curso');
 const Unidad = require('./Unidad');
 const Sesion = require('./Sesion');
 const Actividad = require('./Actividad');
+const Entrega = require('./Entrega');
+const ArchivoEntrega = require('./ArchivoEntrega');
 
 // Definir todas las relaciones aquí para evitar referencias circulares
 
@@ -39,9 +41,33 @@ Actividad.belongsTo(Sesion, {
   as: 'sesion'
 });
 
+// Actividad -> Entrega
+Actividad.hasMany(Entrega, { 
+  foreignKey: 'id_actividad',
+  as: 'entregas'
+});
+
+Entrega.belongsTo(Actividad, { 
+  foreignKey: 'id_actividad',
+  as: 'actividad'
+});
+
+// Entrega -> ArchivoEntrega
+Entrega.hasMany(ArchivoEntrega, { 
+  foreignKey: 'id_entrega',
+  as: 'archivos'
+});
+
+ArchivoEntrega.belongsTo(Entrega, { 
+  foreignKey: 'id_entrega',
+  as: 'entrega'
+});
+
 module.exports = {
   Curso,
   Unidad,
   Sesion,
-  Actividad
+  Actividad,
+  Entrega,
+  ArchivoEntrega
 };
