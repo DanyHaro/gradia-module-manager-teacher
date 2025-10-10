@@ -1,6 +1,5 @@
 // src/controllers/actividadController.js
 const Actividad = require('../models/Actividad');
-const Sesion = require('../models/Sesion');
 const Unidad = require('../models/Unidad');
 const Curso = require('../models/Curso');
 
@@ -10,23 +9,18 @@ const actividadController = {
     try {
       const actividades = await Actividad.findAll({
         include: [{
-          model: Sesion,
-          as: 'sesion',
-          attributes: ['id_sesion', 'titulo_sesion', 'numero_sesion'],
+          model: Unidad,
+          as: 'unidad',
+          attributes: ['id_unidad', 'titulo_unidad', 'numero_unidad'],
           include: [{
-            model: Unidad,
-            as: 'unidad',
-            attributes: ['id_unidad', 'titulo_unidad'],
-            include: [{
-              model: Curso,
-              as: 'curso',
-              attributes: ['id_curso', 'nombre_curso']
-            }]
+            model: Curso,
+            as: 'curso',
+            attributes: ['id_curso', 'nombre_curso']
           }]
         }],
         order: [['created_at', 'DESC']]
       });
-      
+
       res.status(200).json({
         success: true,
         data: actividades,
@@ -42,17 +36,17 @@ const actividadController = {
     }
   },
 
-  // Obtener actividades por sesión
-  getActividadesBySesion: async (req, res) => {
+  // Obtener actividades por unidad
+  getActividadesByUnidad: async (req, res) => {
     try {
-      const { sesionId } = req.params;
-      
+      const { unidadId } = req.params;
+
       const actividades = await Actividad.findAll({
-        where: { id_sesion: sesionId },
+        where: { id_unidad: unidadId },
         include: [{
-          model: Sesion,
-          as: 'sesion',
-          attributes: ['titulo_sesion']
+          model: Unidad,
+          as: 'unidad',
+          attributes: ['titulo_unidad', 'numero_unidad']
         }],
         order: [['created_at', 'ASC']]
       });
@@ -60,10 +54,10 @@ const actividadController = {
       res.status(200).json({
         success: true,
         data: actividades,
-        message: 'Actividades de la sesión obtenidas exitosamente'
+        message: 'Actividades de la unidad obtenidas exitosamente'
       });
     } catch (error) {
-      console.error('Error al obtener actividades por sesión:', error);
+      console.error('Error al obtener actividades por unidad:', error);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
@@ -76,21 +70,16 @@ const actividadController = {
   getActividadById: async (req, res) => {
     try {
       const { id } = req.params;
-      
+
       const actividad = await Actividad.findByPk(id, {
         include: [{
-          model: Sesion,
-          as: 'sesion',
-          attributes: ['id_sesion', 'titulo_sesion', 'numero_sesion'],
+          model: Unidad,
+          as: 'unidad',
+          attributes: ['id_unidad', 'titulo_unidad', 'numero_unidad'],
           include: [{
-            model: Unidad,
-            as: 'unidad',
-            attributes: ['id_unidad', 'titulo_unidad'],
-            include: [{
-              model: Curso,
-              as: 'curso',
-              attributes: ['id_curso', 'nombre_curso']
-            }]
+            model: Curso,
+            as: 'curso',
+            attributes: ['id_curso', 'nombre_curso']
           }]
         }]
       });
@@ -120,21 +109,21 @@ const actividadController = {
   // Crear nueva actividad
   createActividad: async (req, res) => {
     try {
-      const { 
-        nombre_actividad, 
-        descripcion, 
-        fecha_limite, 
-        tipo_actividad, 
-        id_sesion, 
+      const {
+        nombre_actividad,
+        descripcion,
+        fecha_limite,
+        tipo_actividad,
+        id_unidad,
         id_usuario,
-        id_rubrica 
+        id_rubrica
       } = req.body;
 
       // Validar campos requeridos
-      if (!nombre_actividad || !tipo_actividad || !id_sesion || !id_usuario) {
+      if (!nombre_actividad || !tipo_actividad || !id_unidad || !id_usuario) {
         return res.status(400).json({
           success: false,
-          message: 'Los campos nombre_actividad, tipo_actividad, id_sesion e id_usuario son obligatorios'
+          message: 'Los campos nombre_actividad, tipo_actividad, id_unidad e id_usuario son obligatorios'
         });
       }
 
@@ -146,12 +135,12 @@ const actividadController = {
         });
       }
 
-      // Verificar que la sesión existe
-      const sesionExiste = await Sesion.findByPk(id_sesion);
-      if (!sesionExiste) {
+      // Verificar que la unidad existe
+      const unidadExiste = await Unidad.findByPk(id_unidad);
+      if (!unidadExiste) {
         return res.status(404).json({
           success: false,
-          message: 'La sesión especificada no existe'
+          message: 'La unidad especificada no existe'
         });
       }
 
@@ -160,19 +149,19 @@ const actividadController = {
         descripcion,
         fecha_limite,
         tipo_actividad,
-        id_sesion,
+        id_unidad,
         id_usuario,
         id_rubrica,
         created_at: new Date(),
         updated_at: new Date()
       });
 
-      // Obtener la actividad creada con la sesión incluida
+      // Obtener la actividad creada con la unidad incluida
       const actividadCompleta = await Actividad.findByPk(nuevaActividad.id_actividad, {
         include: [{
-          model: Sesion,
-          as: 'sesion',
-          attributes: ['titulo_sesion']
+          model: Unidad,
+          as: 'unidad',
+          attributes: ['titulo_unidad']
         }]
       });
 
@@ -195,16 +184,16 @@ const actividadController = {
   updateActividad: async (req, res) => {
     try {
       const { id } = req.params;
-      const { 
-        nombre_actividad, 
-        descripcion, 
-        fecha_limite, 
+      const {
+        nombre_actividad,
+        descripcion,
+        fecha_limite,
         tipo_actividad,
-        id_rubrica 
+        id_rubrica
       } = req.body;
 
       const actividad = await Actividad.findByPk(id);
-      
+
       if (!actividad) {
         return res.status(404).json({
           success: false,
@@ -231,9 +220,9 @@ const actividadController = {
 
       const actividadActualizada = await Actividad.findByPk(id, {
         include: [{
-          model: Sesion,
-          as: 'sesion',
-          attributes: ['titulo_sesion']
+          model: Unidad,
+          as: 'unidad',
+          attributes: ['titulo_unidad']
         }]
       });
 
@@ -258,7 +247,7 @@ const actividadController = {
       const { id } = req.params;
 
       const actividad = await Actividad.findByPk(id);
-      
+
       if (!actividad) {
         return res.status(404).json({
           success: false,

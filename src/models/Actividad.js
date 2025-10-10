@@ -29,10 +29,10 @@ const Actividad = sequelize.define('Actividad', {
     allowNull: false,
     field: 'tipo_actividad'
   },
-  id_sesion: {
+  id_unidad: {
     type: DataTypes.INTEGER,
     allowNull: false,
-    field: 'id_sesion'
+    field: 'id_unidad'
   },
   id_usuario: {
     type: DataTypes.INTEGER,

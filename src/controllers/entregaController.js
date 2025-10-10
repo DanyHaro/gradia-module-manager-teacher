@@ -2,7 +2,6 @@
 const Entrega = require('../models/Entrega');
 const ArchivoEntrega = require('../models/ArchivoEntrega');
 const Actividad = require('../models/Actividad');
-const Sesion = require('../models/Sesion');
 const Unidad = require('../models/Unidad');
 const Curso = require('../models/Curso');
 
@@ -17,18 +16,13 @@ const entregaController = {
             as: 'actividad',
             attributes: ['id_actividad', 'nombre_actividad', 'tipo_actividad', 'fecha_limite'],
             include: [{
-              model: Sesion,
-              as: 'sesion',
-              attributes: ['titulo_sesion'],
+              model: Unidad,
+              as: 'unidad',
+              attributes: ['titulo_unidad', 'numero_unidad'],
               include: [{
-                model: Unidad,
-                as: 'unidad',
-                attributes: ['titulo_unidad'],
-                include: [{
-                  model: Curso,
-                  as: 'curso',
-                  attributes: ['nombre_curso']
-                }]
+                model: Curso,
+                as: 'curso',
+                attributes: ['nombre_curso']
               }]
             }]
           },
@@ -40,7 +34,7 @@ const entregaController = {
         ],
         order: [['fecha_entrega', 'DESC']]
       });
-      
+
       res.status(200).json({
         success: true,
         data: entregas,
@@ -115,7 +109,7 @@ const entregaController = {
   getEntregasByCurso: async (req, res) => {
     try {
       const { cursoId } = req.params;
-      
+
       const entregas = await Entrega.findAll({
         include: [
           {
@@ -123,14 +117,10 @@ const entregaController = {
             as: 'actividad',
             attributes: ['nombre_actividad', 'tipo_actividad', 'fecha_limite'],
             include: [{
-              model: Sesion,
-              as: 'sesion',
-              include: [{
-                model: Unidad,
-                as: 'unidad',
-                where: { id_curso: cursoId },
-                attributes: ['titulo_unidad']
-              }]
+              model: Unidad,
+              as: 'unidad',
+              where: { id_curso: cursoId },
+              attributes: ['titulo_unidad']
             }]
           },
           {
@@ -161,7 +151,7 @@ const entregaController = {
   getEntregasByUsuario: async (req, res) => {
     try {
       const { usuarioId } = req.params;
-      
+
       const entregas = await Entrega.findAll({
         where: { id_usuario: usuarioId },
         include: [
@@ -170,14 +160,9 @@ const entregaController = {
             as: 'actividad',
             attributes: ['nombre_actividad', 'fecha_limite', 'tipo_actividad'],
             include: [{
-              model: Sesion,
-              as: 'sesion',
-              attributes: ['titulo_sesion'],
-              include: [{
-                model: Unidad,
-                as: 'unidad',
-                attributes: ['titulo_unidad']
-              }]
+              model: Unidad,
+              as: 'unidad',
+              attributes: ['titulo_unidad']
             }]
           },
           {
@@ -249,7 +234,7 @@ const entregaController = {
   getEstadisticasEntregas: async (req, res) => {
     try {
       const { cursoId } = req.query;
-      
+
       let whereClause = {};
       let includeClause = [
         {
@@ -262,13 +247,9 @@ const entregaController = {
       // Si se especifica un curso, filtrar por ese curso
       if (cursoId) {
         includeClause[0].include = [{
-          model: Sesion,
-          as: 'sesion',
-          include: [{
-            model: Unidad,
-            as: 'unidad',
-            where: { id_curso: cursoId }
-          }]
+          model: Unidad,
+          as: 'unidad',
+          where: { id_curso: cursoId }
         }];
       }
 
