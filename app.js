@@ -56,7 +56,7 @@ app.use('/api/materiales', materialRoutes);
 app.get('/', (req, res) => {
     res.json({
         message: 'API de GradIA - Sistema de Gestión Académica para Docentes',
-        version: '3.0.0',
+        version: '4.0.0',
         modulos: {
             gestion_cursos: {
                 descripcion: 'Gestión completa de cursos, unidades y actividades',
@@ -80,6 +80,27 @@ app.get('/', (req, res) => {
                     criterios: '/api/criterios',
                     evaluaciones: '/api/evaluaciones'
                 }
+            },
+            gestion_grupos: {
+                descripcion: 'Gestión de grupos para actividades grupales',
+                endpoints: {
+                    grupos: '/api/grupos',
+                    miembros: '/api/grupos/:id/miembros'
+                }
+            },
+            sistema_comentarios: {
+                descripcion: 'Sistema de feedback y comentarios sobre entregas',
+                endpoints: {
+                    comentarios: '/api/comentarios',
+                    por_entrega: '/api/comentarios/entrega/:entregaId'
+                }
+            },
+            gestion_materiales: {
+                descripcion: 'Gestión de materiales y documentos de actividades',
+                endpoints: {
+                    materiales: '/api/materiales',
+                    por_actividad: '/api/materiales/actividad/:actividadId'
+                }
             }
         },
         funcionalidades: [
@@ -87,6 +108,9 @@ app.get('/', (req, res) => {
             'Gestión de entregas de estudiantes',
             'Sistema de rúbricas y criterios',
             'Evaluación detallada por criterios',
+            'Gestión de grupos para trabajos grupales',
+            'Sistema de comentarios y feedback',
+            'Gestión de materiales educativos',
             'Estadísticas y reportes',
             'Feedback automatizado'
         ]
@@ -102,10 +126,13 @@ app.get('/api/health', async (req, res) => {
             database: 'Connected',
             modulos_disponibles: [
                 'Gestión de Cursos',
-                'Gestión de Entregas', 
-                'Sistema de Evaluación'
+                'Gestión de Entregas',
+                'Sistema de Evaluación',
+                'Gestión de Grupos',
+                'Sistema de Comentarios',
+                'Gestión de Materiales'
             ],
-            endpoints_totales: 35, // Sin sesiones, arquitectura simplificada
+            endpoints_totales: 62, // Total completo con todos los módulos
             timestamp: new Date().toISOString()
         });
     } catch (error) {
@@ -137,14 +164,30 @@ app.get('/api/resumen', (req, res) => {
             sistema_evaluacion: {
                 tablas: ['rubrica', 'criterio', 'rubrica_criterio', 'nivel_criterio', 'evaluacion', 'detalle_evaluacion'],
                 endpoints: 16,
-                estado: 'Recién Implementado 🚀'
+                estado: 'Completo ✅'
+            },
+            gestion_grupos: {
+                tablas: ['grupo', 'miembro_grupo'],
+                endpoints: 8,
+                estado: 'Completo ✅'
+            },
+            sistema_comentarios: {
+                tablas: ['comentario'],
+                endpoints: 5,
+                estado: 'Completo ✅'
+            },
+            gestion_materiales: {
+                tablas: ['documento_actividad'],
+                endpoints: 6,
+                estado: 'Completo ✅'
             }
         },
+        completitud: '100% ✅',
         proximos_pasos: [
-            'Gestión de grupos para actividades grupales',
-            'Sistema de comentarios y feedback',
             'Reportes avanzados y analytics',
-            'Integración con IA para feedback automático'
+            'Integración con IA para feedback automático',
+            'Sistema de notificaciones en tiempo real',
+            'Dashboard estadístico para docentes'
         ],
         tecnologias: ['Node.js', 'Express', 'Sequelize', 'PostgreSQL'],
         base_datos: 'PostgreSQL en Render.com'
@@ -164,6 +207,9 @@ app.use('*', (req, res) => {
             rubricas: '/api/rubricas',
             criterios: '/api/criterios',
             evaluaciones: '/api/evaluaciones',
+            grupos: '/api/grupos',
+            comentarios: '/api/comentarios',
+            materiales: '/api/materiales',
             health: '/api/health',
             resumen: '/api/resumen'
         }
@@ -185,7 +231,7 @@ const startServer = async () => {
     try {
         // Probar conexión a la base de datos
         await testConnection();
-        
+
         // Iniciar servidor
         app.listen(PORT, () => {
             console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
@@ -195,8 +241,12 @@ const startServer = async () => {
             console.log(`📊 Módulos disponibles:`);
             console.log(`   ✅ Gestión de Cursos (19 endpoints)`);
             console.log(`   ✅ Gestión de Entregas (8 endpoints)`);
-            console.log(`   🚀 Sistema de Evaluación (16 endpoints)`);
-            console.log(`📈 Total de endpoints: 43`);
+            console.log(`   ✅ Sistema de Evaluación (16 endpoints)`);
+            console.log(`   ✅ Gestión de Grupos (8 endpoints)`);
+            console.log(`   ✅ Sistema de Comentarios (5 endpoints)`);
+            console.log(`   ✅ Gestión de Materiales (6 endpoints)`);
+            console.log(`📈 Total de endpoints: 62`);
+            console.log(`🎉 Backend completado al 100%!`);
         });
     } catch (error) {
         console.error('❌ Error al iniciar el servidor:', error);
