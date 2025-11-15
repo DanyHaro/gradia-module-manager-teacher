@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const unidadController = require('../controllers/unidadController');
+const authenticate = require('../middlewares/authenticate');
+
+// 🔒 Todas las rutas requieren autenticación
+router.use(authenticate);
 
 // Rutas para unidades
 router.get('/', unidadController.getAllUnidades);

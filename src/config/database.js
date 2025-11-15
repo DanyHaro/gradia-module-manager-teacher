@@ -3,11 +3,11 @@ const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize({
   dialect: 'postgres',
-  host: 'dpg-d353crd6ubrc73cru5ag-a.oregon-postgres.render.com',
+  host: 'dpg-d3r732u3jp1c7393ltdg-a.oregon-postgres.render.com',
   port: 5432,
-  database: 'gradiabd',
-  username: 'gradiabd_user',
-  password: 'O9brCLqxzeGOiV73JfJOXH8u6Y71lze7',
+  database: 'grad_ia_bd',
+  username: 'gradia_user',
+  password: 'wA1ULtUE7BzIQBD8vL3OL9j1lxXcs0er',
   dialectOptions: {
     ssl: {
       require: true,

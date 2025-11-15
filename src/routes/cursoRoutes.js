@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const cursoController = require('../controllers/cursoController');
+const authenticate = require('../middlewares/authenticate');
+
+// 🔒 Todas las rutas requieren autenticación
+router.use(authenticate);
 
 // Rutas para cursos
 router.get('/', cursoController.getAllCursos);
