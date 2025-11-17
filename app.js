@@ -28,8 +28,16 @@ const materialRoutes = require('./src/routes/materialRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configuración de CORS para permitir credenciales
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true, // Permitir cookies y headers de autenticación
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+};
+
 // Middlewares
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
