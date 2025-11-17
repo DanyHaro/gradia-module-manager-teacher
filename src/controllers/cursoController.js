@@ -1,20 +1,32 @@
 // controllers/cursoController.js
 const Curso = require('../models/Curso');
 const Unidad = require('../models/Unidad');
+const Inscripcion = require('../models/Inscripcion');
 
 const cursoController = {
-  // Obtener todos los cursos
+  // Obtener todos los cursos del docente autenticado (donde está inscrito)
   getAllCursos: async (req, res) => {
     try {
+      const userId = req.user.id; // ID del docente autenticado desde JWT
+
+      // Buscar cursos donde el docente está inscrito
       const cursos = await Curso.findAll({
-        include: [{
-          model: Unidad,
-          as: 'unidades',
-          attributes: ['id_unidad', 'titulo_unidad', 'numero_unidad']
-        }],
+        include: [
+          {
+            model: Inscripcion,
+            as: 'inscripciones',
+            where: { id_usuario: userId }, // Solo cursos donde está inscrito
+            attributes: [] // No incluir datos de inscripción en respuesta
+          },
+          {
+            model: Unidad,
+            as: 'unidades',
+            attributes: ['id_unidad', 'titulo_unidad', 'numero_unidad']
+          }
+        ],
         order: [['created_at', 'DESC']]
       });
-      
+
       res.status(200).json({
         success: true,
         data: cursos,

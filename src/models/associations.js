@@ -23,6 +23,21 @@ const Comentario = require('./Comentario');
 // Modelo de Materiales (Documentos de Actividad)
 const MaterialActividad = require('./MaterialUnidad');
 
+// Modelo de Inscripción
+const Inscripcion = require('./Inscripcion');
+
+// ========== RELACIONES DE INSCRIPCIÓN ==========
+
+// Usuario-Curso a través de Inscripcion (relación N:M)
+Curso.hasMany(Inscripcion, {
+    foreignKey: 'id_curso',
+    as: 'inscripciones'
+});
+Inscripcion.belongsTo(Curso, {
+    foreignKey: 'id_curso',
+    as: 'curso'
+});
+
 // ========== RELACIONES EXISTENTES ==========
 
 // Curso -> Unidad
@@ -223,5 +238,7 @@ module.exports = {
     // Modelo de comentarios
     Comentario,
     // Modelo de materiales
-    MaterialActividad
+    MaterialActividad,
+    // Modelo de inscripción
+    Inscripcion
 };
