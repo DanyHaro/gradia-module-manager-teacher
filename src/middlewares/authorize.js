@@ -30,7 +30,7 @@ const authorize = (allowedRoles) => {
                 WHERE ur.id_usuario = :userId AND r.estado = 'ACTIVO'
             `;
 
-            const [userRoles] = await sequelize.query(query, {
+            const userRoles = await sequelize.query(query, {
                 replacements: { userId },
                 type: sequelize.QueryTypes.SELECT
             });
