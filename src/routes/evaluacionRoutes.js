@@ -2,6 +2,10 @@
 const express = require('express');
 const router = express.Router();
 const evaluacionController = require('../controllers/evaluacionController');
+const authenticate = require('../middlewares/authenticate');
+
+// 🔒 Todas las rutas requieren autenticación
+router.use(authenticate);
 
 // Rutas para gestión de evaluaciones (vista docente)
 router.get('/', evaluacionController.getAllEvaluaciones);

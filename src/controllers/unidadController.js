@@ -1,6 +1,7 @@
 // controllers/unidadController.js
 const Unidad = require('../models/Unidad');
 const Curso = require('../models/Curso');
+const { verificarInscripcionEnCurso } = require('../utils/inscripcionHelper');
 
 const unidadController = {
   // Obtener todas las unidades
@@ -99,12 +100,23 @@ const unidadController = {
   createUnidad: async (req, res) => {
     try {
       const { titulo_unidad, descripcion, numero_unidad, id_curso } = req.body;
+      const userId = req.user.id;
 
       // Validar campos requeridos
       if (!titulo_unidad || !numero_unidad || !id_curso) {
         return res.status(400).json({
           success: false,
           message: 'Los campos titulo_unidad, numero_unidad e id_curso son obligatorios'
+        });
+      }
+
+      // Verificar que el docente esté inscrito en el curso
+      const estaInscrito = await verificarInscripcionEnCurso(userId, id_curso);
+
+      if (!estaInscrito) {
+        return res.status(403).json({
+          success: false,
+          message: 'No tienes permiso para crear unidades en este curso. Solo puedes gestionar cursos donde estás inscrito.'
         });
       }
 

@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const grupoController = require('../controllers/grupoController');
+const authenticate = require('../middlewares/authenticate');
+
+// 🔒 Todas las rutas requieren autenticación
+router.use(authenticate);
 
 // Rutas de grupos
 router.get('/', grupoController.getAllGrupos);

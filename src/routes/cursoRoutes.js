@@ -10,8 +10,11 @@ router.use(authenticate);
 // Rutas para cursos
 router.get('/', cursoController.getAllCursos);
 router.get('/:id', cursoController.getCursoById);
-router.post('/', cursoController.createCurso);
-router.put('/:id', cursoController.updateCurso);
-router.delete('/:id', cursoController.deleteCurso);
+
+// ❌ DESHABILITADO: Los cursos los crea ADMIN directamente en BD
+// Solo docentes pueden ver cursos donde están inscritos
+// router.post('/', cursoController.createCurso);
+// router.put('/:id', cursoController.updateCurso);
+// router.delete('/:id', cursoController.deleteCurso);
 
 module.exports = router;

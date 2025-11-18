@@ -1,7 +1,7 @@
 // Middleware de autorización por roles para backend de Teacher
 // Verifica que el usuario tenga el rol requerido (DOCENTE o ADMIN)
 
-const { sequelize } = require('../config/database');
+const sequelize = require('../config/database');
 
 /**
  * Middleware de autorización por rol
@@ -27,7 +27,7 @@ const authorize = (allowedRoles) => {
                 SELECT r.nombre_rol
                 FROM mantenimiento_usuarios.usuario_rol ur
                 INNER JOIN mantenimiento_usuarios.rol r ON ur.id_rol = r.id_rol
-                WHERE ur.id_usuario = :userId AND r.estado = 'ACTIVO'
+                WHERE ur.id_usuario = :userId AND UPPER(r.estado) = 'ACTIVO'
             `;
 
             const userRoles = await sequelize.query(query, {

@@ -2,6 +2,7 @@
 const Curso = require('../models/Curso');
 const Unidad = require('../models/Unidad');
 const Inscripcion = require('../models/Inscripcion');
+const { verificarInscripcionEnCurso } = require('../utils/inscripcionHelper');
 
 const cursoController = {
   // Obtener todos los cursos del docente autenticado (donde está inscrito)
@@ -46,7 +47,18 @@ const cursoController = {
   getCursoById: async (req, res) => {
     try {
       const { id } = req.params;
-      
+      const userId = req.user.id;
+
+      // Verificar que el docente esté inscrito en el curso
+      const estaInscrito = await verificarInscripcionEnCurso(userId, id);
+
+      if (!estaInscrito) {
+        return res.status(403).json({
+          success: false,
+          message: 'No tienes acceso a este curso. Solo puedes ver cursos donde estás inscrito.'
+        });
+      }
+
       const curso = await Curso.findByPk(id, {
         include: [{
           model: Unidad,

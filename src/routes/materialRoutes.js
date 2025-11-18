@@ -1,6 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const materialController = require('../controllers/materialController');
+const authenticate = require('../middlewares/authenticate');
+
+// 🔒 Todas las rutas requieren autenticación
+router.use(authenticate);
 
 // Rutas de materiales (documentos de actividad)
 router.get('/', materialController.getAllMateriales);

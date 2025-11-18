@@ -2,6 +2,7 @@
 const Actividad = require('../models/Actividad');
 const Unidad = require('../models/Unidad');
 const Curso = require('../models/Curso');
+const { verificarInscripcionEnUnidad } = require('../utils/inscripcionHelper');
 
 const actividadController = {
   // Obtener todas las actividades
@@ -118,6 +119,7 @@ const actividadController = {
         id_usuario,
         id_rubrica
       } = req.body;
+      const userId = req.user.id;
 
       // Validar campos requeridos
       if (!nombre_actividad || !tipo_actividad || !id_unidad || !id_usuario) {
@@ -132,6 +134,16 @@ const actividadController = {
         return res.status(400).json({
           success: false,
           message: 'tipo_actividad debe ser "individual" o "grupal"'
+        });
+      }
+
+      // Verificar que el docente esté inscrito en el curso de la unidad
+      const estaInscrito = await verificarInscripcionEnUnidad(userId, id_unidad);
+
+      if (!estaInscrito) {
+        return res.status(403).json({
+          success: false,
+          message: 'No tienes permiso para crear actividades en este curso. Solo puedes gestionar cursos donde estás inscrito.'
         });
       }
 

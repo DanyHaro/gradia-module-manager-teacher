@@ -6,13 +6,15 @@
 
 | Información | Detalle |
 |-------------|---------|
-| **Estado** | ✅ 100% Funcional |
-| **Total de Endpoints** | 62 endpoints operativos |
+| **Estado** | ✅ 100% Funcional con Seguridad JWT |
+| **Total de Endpoints** | 59 endpoints operativos |
 | **Base de Datos** | PostgreSQL en Render.com |
 | **Stack Tecnológico** | Node.js + Express.js + Sequelize |
-| **Arquitectura** | Patrón MVC |
+| **Arquitectura** | Patrón MVC + RBAC |
 | **Base URL** | `http://localhost:3000` |
-| **Versión** | 4.0.0 |
+| **Versión** | 5.0.0 |
+| **Autenticación** | ✅ JWT (HS256) |
+| **Control de Acceso** | ✅ Basado en Inscripciones |
 
 ---
 
@@ -20,14 +22,15 @@
 
 | # | Módulo | Endpoints | Estado |
 |---|--------|-----------|--------|
-| 1 | [Gestión de Cursos](#1️⃣-gestión-de-cursos) | 19 | ✅ |
-| 2 | [Gestión de Entregas](#2️⃣-gestión-de-entregas) | 8 | ✅ |
-| 3 | [Sistema de Evaluación](#3️⃣-sistema-de-evaluación-con-rúbricas) | 16 | ✅ |
-| 4 | [Gestión de Grupos](#4️⃣-gestión-de-grupos) | 8 | ✅ |
-| 5 | [Sistema de Comentarios](#5️⃣-sistema-de-comentarios) | 5 | ✅ |
-| 6 | [Gestión de Materiales](#6️⃣-gestión-de-materiales) | 6 | ✅ |
+| 1 | [Gestión de Cursos](#1️⃣-gestión-de-cursos) | 16 | ✅ 🔒 |
+| 2 | [Gestión de Entregas](#2️⃣-gestión-de-entregas) | 8 | ✅ 🔒 |
+| 3 | [Sistema de Evaluación](#3️⃣-sistema-de-evaluación-con-rúbricas) | 16 | ✅ 🔒 |
+| 4 | [Gestión de Grupos](#4️⃣-gestión-de-grupos) | 8 | ✅ 🔒 |
+| 5 | [Sistema de Comentarios](#5️⃣-sistema-de-comentarios) | 5 | ✅ 🔒 |
+| 6 | [Gestión de Materiales](#6️⃣-gestión-de-materiales) | 6 | ✅ 🔒 |
 
-**Total:** 62 endpoints
+**Total:** 59 endpoints
+**🔒 Todos los endpoints requieren autenticación JWT**
 
 ---
 
@@ -59,47 +62,58 @@
 
 ## 1️⃣ GESTIÓN DE CURSOS
 
-**Total:** 19 endpoints (Cursos: 5 | Unidades: 6 | Actividades: 6 | Sesiones: 2)
+**Total:** 16 endpoints (Cursos: 2 | Unidades: 6 | Actividades: 6 | Sesiones: 2)
 
-### 📌 Cursos - `/api/cursos` (5 endpoints)
+### 📌 Cursos - `/api/cursos` (2 endpoints) 🔒
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/api/cursos` | Listar todos los cursos con sus unidades |
-| `GET` | `/api/cursos/:id` | Obtener curso específico por ID |
-| `POST` | `/api/cursos` | Crear nuevo curso |
-| `PUT` | `/api/cursos/:id` | Actualizar curso existente |
-| `DELETE` | `/api/cursos/:id` | Eliminar curso (sin unidades asociadas) |
+| Método | Endpoint | Descripción | Autenticación | Control de Acceso |
+|--------|----------|-------------|---------------|-------------------|
+| `GET` | `/api/cursos` | Listar todos los cursos donde el docente está inscrito | ✅ JWT | Solo cursos inscritos |
+| `GET` | `/api/cursos/:id` | Obtener curso específico por ID | ✅ JWT | Solo si está inscrito |
+
+**⚠️ IMPORTANTE:**
+- **Cursos NO se pueden crear, editar ni eliminar** desde este backend
+- Los cursos son creados por el **ADMINISTRADOR** directamente en la base de datos
+- Los docentes solo pueden **VER** los cursos donde están inscritos (tabla `inscripcion`)
+- El acceso está restringido por la tabla `inscripcion` (N:M entre usuarios y cursos)
 
 **Campos principales:** `nombre_curso`, `descripcion`, `estado`, `id_usuario`
 
 ---
 
-### 📌 Unidades - `/api/unidades` (6 endpoints)
+### 📌 Unidades - `/api/unidades` (6 endpoints) 🔒
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/api/unidades` | Listar todas las unidades |
-| `GET` | `/api/unidades/:id` | Obtener unidad específica por ID |
-| `GET` | `/api/unidades/curso/:cursoId` | Obtener todas las unidades de un curso |
-| `POST` | `/api/unidades` | Crear nueva unidad |
-| `PUT` | `/api/unidades/:id` | Actualizar unidad existente |
-| `DELETE` | `/api/unidades/:id` | Eliminar unidad (sin actividades asociadas) |
+| Método | Endpoint | Descripción | Control de Acceso |
+|--------|----------|-------------|-------------------|
+| `GET` | `/api/unidades` | Listar todas las unidades | ✅ JWT |
+| `GET` | `/api/unidades/:id` | Obtener unidad específica por ID | ✅ JWT |
+| `GET` | `/api/unidades/curso/:cursoId` | Obtener todas las unidades de un curso | ✅ JWT |
+| `POST` | `/api/unidades` | Crear nueva unidad | ✅ JWT + Inscripción validada |
+| `PUT` | `/api/unidades/:id` | Actualizar unidad existente | ✅ JWT |
+| `DELETE` | `/api/unidades/:id` | Eliminar unidad (sin actividades asociadas) | ✅ JWT |
+
+**🔐 Control de Acceso:**
+- Solo los docentes **inscritos** en el curso pueden crear unidades
+- Se valida automáticamente la inscripción antes de permitir la creación
 
 **Campos principales:** `titulo_unidad`, `descripcion`, `numero_unidad`, `id_curso`
 
 ---
 
-### 📌 Actividades - `/api/actividades` (6 endpoints)
+### 📌 Actividades - `/api/actividades` (6 endpoints) 🔒
 
-| Método | Endpoint | Descripción |
-|--------|----------|-------------|
-| `GET` | `/api/actividades` | Listar todas las actividades |
-| `GET` | `/api/actividades/:id` | Obtener actividad específica por ID |
-| `GET` | `/api/actividades/unidad/:unidadId` | Obtener todas las actividades de una unidad |
-| `POST` | `/api/actividades` | Crear nueva actividad (tarea) |
-| `PUT` | `/api/actividades/:id` | Actualizar actividad existente |
-| `DELETE` | `/api/actividades/:id` | Eliminar actividad (sin entregas asociadas) |
+| Método | Endpoint | Descripción | Control de Acceso |
+|--------|----------|-------------|-------------------|
+| `GET` | `/api/actividades` | Listar todas las actividades | ✅ JWT |
+| `GET` | `/api/actividades/:id` | Obtener actividad específica por ID | ✅ JWT |
+| `GET` | `/api/actividades/unidad/:unidadId` | Obtener todas las actividades de una unidad | ✅ JWT |
+| `POST` | `/api/actividades` | Crear nueva actividad (tarea) | ✅ JWT + Inscripción validada |
+| `PUT` | `/api/actividades/:id` | Actualizar actividad existente | ✅ JWT |
+| `DELETE` | `/api/actividades/:id` | Eliminar actividad (sin entregas asociadas) | ✅ JWT |
+
+**🔐 Control de Acceso:**
+- Solo los docentes **inscritos** en el curso de la unidad pueden crear actividades
+- Se valida automáticamente la inscripción antes de permitir la creación
 
 **Campos principales:** `nombre_actividad`, `descripcion`, `fecha_limite`, `tipo_actividad`, `id_unidad`, `id_usuario`, `id_rubrica`
 
@@ -405,38 +419,46 @@ EVALUACION (1) ─→ (N) DETALLE_EVALUACION
 
 ## 🔐 SEGURIDAD Y AUTENTICACIÓN
 
-### ⚠️ Actualmente NO implementado:
+### ✅ Implementado:
 
-- ❌ Autenticación JWT
-- ❌ Validación de roles (RBAC)
-- ❌ Verificación de permisos por recurso
+- ✅ **Autenticación JWT (HS256)** - Todos los endpoints protegidos
+- ✅ **Validación de roles (RBAC)** - Middleware `authorize(['DOCENTE', 'ADMIN'])`
+- ✅ **Control de acceso basado en inscripciones** - Solo acceso a cursos inscritos
+- ✅ **Helper functions** para validar inscripción en cursos/unidades/actividades
+- ✅ **Validación automática** en operaciones críticas (crear unidades, actividades)
+
+### 🔒 Flujo de Seguridad:
+
+1. **Login** → Backend de Autenticación genera JWT
+2. **Cada Request** → Frontend envía JWT en header `Authorization: Bearer <token>`
+3. **Middleware `authenticate`** → Valida JWT y extrae usuario (`req.user`)
+4. **Middleware `authorize`** → Verifica rol del usuario (DOCENTE o ADMIN)
+5. **Helper `verificarInscripcionEnCurso`** → Valida acceso al curso/unidad/actividad
+6. **Controller** → Ejecuta lógica de negocio si todas las validaciones pasan
+
+### ⚠️ Pendiente:
+
 - ❌ Rate limiting
 - ❌ Validación de inputs con Joi/Yup
 
-### 📝 Recomendaciones para Fase 2:
+### 📝 Recomendaciones para mejoras futuras:
 
-1. **Autenticación y Autorización**
-   - Implementar JWT en todos los endpoints
-   - Middleware de autorización por rol (docente/estudiante)
-   - Verificar permisos por recurso
-
-2. **Validación y Seguridad**
+1. **Validación y Seguridad**
    - Implementar validación de schemas con Joi/Yup
    - Sanitización de inputs
-   - Protección contra SQL Injection
    - Rate limiting por IP
 
-3. **Testing**
+2. **Testing**
    - Tests unitarios con Jest
    - Tests de integración
    - Cobertura mínima 70%
 
-4. **Performance**
+3. **Performance**
    - Paginación en endpoints de listado
    - Índices optimizados en BD
    - Caching con Redis
 
-5. **DevOps**
+4. **DevOps**
    - Docker/Docker Compose
    - CI/CD pipeline
    - Monitoring y logging centralizado
@@ -447,24 +469,25 @@ EVALUACION (1) ─→ (N) DETALLE_EVALUACION
 
 | Métrica | Cantidad |
 |---------|----------|
-| **Endpoints Implementados** | 62 |
+| **Endpoints Implementados** | 59 |
 | **Modelos Sequelize** | 16 |
 | **Controllers** | 10 |
 | **Archivos de Rutas** | 10 |
 | **Tablas en BD** | 16 |
 | **Schemas en PostgreSQL** | 4 |
-| **Líneas de Código** | ~8,000+ |
+| **Líneas de Código** | ~9,000+ |
+| **Helper Functions (Seguridad)** | 7 |
 
 ### Distribución por Módulo
 
 | Módulo | Endpoints | % del Total |
 |--------|-----------|-------------|
-| Gestión de Cursos | 19 | 30.6% |
-| Sistema de Evaluación | 16 | 25.8% |
-| Gestión de Entregas | 8 | 12.9% |
-| Gestión de Grupos | 8 | 12.9% |
-| Gestión de Materiales | 6 | 9.7% |
-| Sistema de Comentarios | 5 | 8.1% |
+| Sistema de Evaluación | 16 | 27.1% |
+| Gestión de Cursos | 16 | 27.1% |
+| Gestión de Entregas | 8 | 13.6% |
+| Gestión de Grupos | 8 | 13.6% |
+| Gestión de Materiales | 6 | 10.2% |
+| Sistema de Comentarios | 5 | 8.5% |
 
 ---
 
@@ -514,7 +537,7 @@ EVALUACION (1) ─→ (N) DETALLE_EVALUACION
 
 ## 🎯 ESTADO DEL PROYECTO
 
-**✅ BACKEND 100% COMPLETADO**
+**✅ BACKEND 100% COMPLETADO Y SEGURO**
 
 ### ✅ Implementado:
 - ✅ Gestión completa de cursos y contenido académico
@@ -523,18 +546,24 @@ EVALUACION (1) ─→ (N) DETALLE_EVALUACION
 - ✅ Sistema de comentarios para feedback detallado
 - ✅ Materiales educativos por actividad
 - ✅ Seguimiento de entregas con estadísticas
+- ✅ **Autenticación JWT completa** (HS256)
+- ✅ **Control de acceso basado en roles** (RBAC)
+- ✅ **Validación de inscripciones** en operaciones críticas
+- ✅ **Helper functions** para seguridad
 - ✅ Arquitectura escalable y mantenible
 - ✅ Código limpio siguiendo patrones MVC
-- ✅ Documentación completa
+- ✅ Documentación completa y actualizada
 
 ### 🔜 Pendiente (Opcional):
-- ⏳ Autenticación y autorización
 - ⏳ Testing automatizado
-- ⏳ Módulos adicionales (estudiantes, notificaciones, etc.)
+- ⏳ Rate limiting
+- ⏳ Validación con Joi/Yup
+- ⏳ Módulos adicionales (notificaciones, reportes, etc.)
 
 ---
 
-**Última actualización:** 2025-10-11
-**Versión del API:** 4.0.0
-**Versión de este documento:** 2.0
+**Última actualización:** 2025-01-17
+**Versión del API:** 5.0.0
+**Versión de este documento:** 3.0
 **Stack:** Node.js v20.10.0 + Express.js v4.21.2 + Sequelize v6.37.7 + PostgreSQL
+**Seguridad:** JWT (HS256) + RBAC + Control de Inscripciones
