@@ -7,12 +7,13 @@
 | Información | Detalle |
 |-------------|---------|
 | **Estado** | ✅ 100% Funcional con Seguridad JWT |
-| **Total de Endpoints** | 59 endpoints operativos |
+| **Total de Endpoints** | 58 endpoints operativos |
 | **Base de Datos** | PostgreSQL en Render.com |
 | **Stack Tecnológico** | Node.js + Express.js + Sequelize |
 | **Arquitectura** | Patrón MVC + RBAC |
 | **Base URL** | `http://localhost:3000` |
-| **Versión** | 5.0.0 |
+| **Versión** | 2.0.0 |
+| **Última Actualización** | 2025-11-20 |
 | **Autenticación** | ✅ JWT (HS256) |
 | **Control de Acceso** | ✅ Basado en Inscripciones |
 
@@ -22,14 +23,17 @@
 
 | # | Módulo | Endpoints | Estado |
 |---|--------|-----------|--------|
-| 1 | [Gestión de Cursos](#1️⃣-gestión-de-cursos) | 16 | ✅ 🔒 |
-| 2 | [Gestión de Entregas](#2️⃣-gestión-de-entregas) | 8 | ✅ 🔒 |
-| 3 | [Sistema de Evaluación](#3️⃣-sistema-de-evaluación-con-rúbricas) | 16 | ✅ 🔒 |
-| 4 | [Gestión de Grupos](#4️⃣-gestión-de-grupos) | 8 | ✅ 🔒 |
-| 5 | [Sistema de Comentarios](#5️⃣-sistema-de-comentarios) | 5 | ✅ 🔒 |
-| 6 | [Gestión de Materiales](#6️⃣-gestión-de-materiales) | 6 | ✅ 🔒 |
+| 1 | [Gestión de Cursos](#1️⃣-gestión-de-cursos) | 2 (Solo lectura) | ✅ 🔒 |
+| 2 | [Gestión de Unidades](#2️⃣-gestión-de-unidades) | 6 | ✅ 🔒 |
+| 3 | [Gestión de Actividades](#3️⃣-gestión-de-actividades) | 6 | ✅ 🔒 |
+| 4 | [Gestión de Entregas](#4️⃣-gestión-de-entregas) | 8 | ✅ 🔒 |
+| 5 | [Sistema de Evaluación](#5️⃣-sistema-de-evaluación-con-rúbricas) | 16 | ✅ 🔒 |
+| 6 | [Gestión de Grupos](#6️⃣-gestión-de-grupos) | 8 | ✅ 🔒 |
+| 7 | [Sistema de Comentarios](#7️⃣-sistema-de-comentarios) | 5 | ✅ 🔒 |
+| 8 | [Gestión de Materiales](#8️⃣-gestión-de-materiales) | 6 | ✅ 🔒 |
+| 9 | [Sistema de Rúbricas](#9️⃣-sistema-de-rúbricas) | ~7 | ✅ 🔒 |
 
-**Total:** 59 endpoints
+**Total:** ~58 endpoints
 **🔒 Todos los endpoints requieren autenticación JWT**
 
 ---
@@ -62,7 +66,9 @@
 
 ## 1️⃣ GESTIÓN DE CURSOS
 
-**Total:** 16 endpoints (Cursos: 2 | Unidades: 6 | Actividades: 6 | Sesiones: 2)
+**Total:** 14 endpoints (Cursos: 2 solo lectura | Unidades: 6 | Actividades: 6)
+
+⚠️ **CAMBIO IMPORTANTE:** Los endpoints de crear/editar/eliminar cursos fueron eliminados. Los cursos se crean manualmente en la BD por el ADMIN.
 
 ### 📌 Cursos - `/api/cursos` (2 endpoints) 🔒
 

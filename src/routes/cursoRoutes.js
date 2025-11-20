@@ -7,14 +7,9 @@ const authenticate = require('../middlewares/authenticate');
 // 🔒 Todas las rutas requieren autenticación
 router.use(authenticate);
 
-// Rutas para cursos
+// Rutas para cursos - Solo lectura
+// Los cursos se crean manualmente en BD por el ADMIN
 router.get('/', cursoController.getAllCursos);
 router.get('/:id', cursoController.getCursoById);
-
-// ❌ DESHABILITADO: Los cursos los crea ADMIN directamente en BD
-// Solo docentes pueden ver cursos donde están inscritos
-// router.post('/', cursoController.createCurso);
-// router.put('/:id', cursoController.updateCurso);
-// router.delete('/:id', cursoController.deleteCurso);
 
 module.exports = router;
