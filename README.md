@@ -56,11 +56,11 @@
   FRONTEND_URL=http://localhost:3000
 
   # Base de datos PostgreSQL
-  DB_HOST=dpg-d3r732u3jp1c7393ltdg-a.oregon-postgres.render.com
+  DB_HOST=dpg-d4f53bili9vc739cgsng-a.oregon-postgres.render.com
   DB_PORT=5432
-  DB_NAME=grad_ia_bd
+  DB_NAME=gradia_database_2025
   DB_USER=gradia_user
-  DB_PASSWORD=wA1ULtUE7BzIQBD8vL3OL9j1lxXcs0er
+  DB_PASSWORD=V8uMNQchR7snMlgBXj2YF165e3CKefY6
 
   # Ambiente
   NODE_ENV=development
@@ -84,11 +84,11 @@
   FRONTEND_URL=https://gradia-frontend.vercel.app
 
   # Base de datos PostgreSQL (misma BD compartida)
-  DB_HOST=dpg-d3r732u3jp1c7393ltdg-a.oregon-postgres.render.com
+  DB_HOST=dpg-d4f53ibili9vc739cgsng-a.oregon-postgres.render.com
   DB_PORT=5432
-  DB_NAME=grad_ia_bd
+  DB_NAME=gradia_database_2025
   DB_USER=gradia_user
-  DB_PASSWORD=wA1ULtUE7BzIQBD8vL3OL9j1lxXcs0er
+  DB_PASSWORD=V8uMNQchR7snMlgBXj2YF165e3CKefY6
 
   # Ambiente
   NODE_ENV=production
@@ -377,11 +377,11 @@
   JWT_SECRET=elgradia2025$
   AUTH_SERVICE_URL=https://auth-gradia.onrender.com
   FRONTEND_URL=https://gradia-frontend.vercel.app
-  DB_HOST=dpg-d3r732u3jp1c7393ltdg-a.oregon-postgres.render.com
+  DB_HOST=dpg-d4f53ibili9vc739cgsng-a.oregon-postgres.render.com
   DB_PORT=5432
-  DB_NAME=grad_ia_bd
+  DB_NAME=gradia_database_2025
   DB_USER=gradia_user
-  DB_PASSWORD=wA1ULtUE7BzIQBD8vL3OL9j1lxXcs0er
+  DB_PASSWORD=V8uMNQchR7snMlgBXj2YF165e3CKefY6
   NODE_ENV=production
   ```
 
