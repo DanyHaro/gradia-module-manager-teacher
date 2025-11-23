@@ -17,6 +17,7 @@ router.get('/estadisticas', entregaController.getEstadisticasEntregas);
 router.get('/:id', entregaController.getEntregaById);
 
 // Rutas de gestión (solo para docentes) - 🔒 Requiere rol DOCENTE
+router.put('/:id/calificar', authorize(['DOCENTE', 'ADMIN']), entregaController.calificarEntrega);
 router.delete('/:id', authorize(['DOCENTE', 'ADMIN']), entregaController.deleteEntrega);
 router.delete('/:entregaId/archivo/:archivoId', authorize(['DOCENTE', 'ADMIN']), entregaController.deleteArchivoEntrega);
 

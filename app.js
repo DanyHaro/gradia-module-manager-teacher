@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { testConnection } = require('./src/config/database');
 
 // 🔧 Importar relaciones ANTES que las rutas
@@ -40,6 +41,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// Servir archivos estáticos (uploads)
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Middleware para logging de requests
 app.use((req, res, next) => {

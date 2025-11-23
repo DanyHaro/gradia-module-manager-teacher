@@ -39,10 +39,15 @@ const Actividad = sequelize.define('Actividad', {
     allowNull: false,
     field: 'id_usuario'
   },
-  id_rubrica: {
+  created_by: {
     type: DataTypes.INTEGER,
     allowNull: true,
-    field: 'id_rubrica'
+    field: 'created_by'
+  },
+  updated_by: {
+    type: DataTypes.INTEGER,
+    allowNull: true,
+    field: 'updated_by'
   },
   created_at: {
     type: DataTypes.DATE,
@@ -55,6 +60,11 @@ const Actividad = sequelize.define('Actividad', {
     allowNull: false,
     defaultValue: DataTypes.NOW,
     field: 'updated_at'
+  },
+  deleted_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'deleted_at'
   }
 }, {
   tableName: 'actividad',

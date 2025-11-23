@@ -116,8 +116,7 @@ const actividadController = {
         fecha_limite,
         tipo_actividad,
         id_unidad,
-        id_usuario,
-        id_rubrica
+        id_usuario
       } = req.body;
       const userId = req.user.id;
 
@@ -163,7 +162,6 @@ const actividadController = {
         tipo_actividad,
         id_unidad,
         id_usuario,
-        id_rubrica,
         created_at: new Date(),
         updated_at: new Date()
       });
@@ -200,8 +198,7 @@ const actividadController = {
         nombre_actividad,
         descripcion,
         fecha_limite,
-        tipo_actividad,
-        id_rubrica
+        tipo_actividad
       } = req.body;
 
       const actividad = await Actividad.findByPk(id);
@@ -226,7 +223,6 @@ const actividadController = {
         descripcion: descripcion !== undefined ? descripcion : actividad.descripcion,
         fecha_limite: fecha_limite !== undefined ? fecha_limite : actividad.fecha_limite,
         tipo_actividad: tipo_actividad || actividad.tipo_actividad,
-        id_rubrica: id_rubrica !== undefined ? id_rubrica : actividad.id_rubrica,
         updated_at: new Date()
       });
 

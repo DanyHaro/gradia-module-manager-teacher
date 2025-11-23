@@ -26,6 +26,10 @@ const MaterialActividad = require('./MaterialUnidad');
 // Modelo de Inscripción
 const Inscripcion = require('./Inscripcion');
 
+// Modelo de Usuario (READ ONLY - tabla compartida con auth_gradia)
+const Usuario = require('./Usuario');
+const Persona = require('./Persona');
+
 // ========== RELACIONES DE INSCRIPCIÓN ==========
 
 // Usuario-Curso a través de Inscripcion (relación N:M)
@@ -36,6 +40,15 @@ Curso.hasMany(Inscripcion, {
 Inscripcion.belongsTo(Curso, {
     foreignKey: 'id_curso',
     as: 'curso'
+});
+
+Inscripcion.belongsTo(Usuario, {
+    foreignKey: 'id_usuario',
+    as: 'usuario'
+});
+Usuario.hasMany(Inscripcion, {
+    foreignKey: 'id_usuario',
+    as: 'inscripciones'
 });
 
 // ========== RELACIONES EXISTENTES ==========
@@ -80,17 +93,27 @@ ArchivoEntrega.belongsTo(Entrega, {
     as: 'entrega'
 });
 
-// ========== NUEVAS RELACIONES DE EVALUACIÓN ==========
+// Entrega -> Usuario (para obtener datos del estudiante)
+Entrega.belongsTo(Usuario, {
+    foreignKey: 'id_usuario',
+    as: 'usuario'
+});
+Usuario.hasMany(Entrega, {
+    foreignKey: 'id_usuario',
+    as: 'entregas'
+});
 
-// Actividad -> Rubrica (una actividad puede tener una rúbrica)
-Actividad.belongsTo(Rubrica, {
-    foreignKey: 'id_rubrica',
-    as: 'rubrica'
+// Usuario -> Persona (para obtener nombre del estudiante)
+Usuario.belongsTo(Persona, {
+    foreignKey: 'id_persona',
+    as: 'persona'
 });
-Rubrica.hasMany(Actividad, {
-    foreignKey: 'id_rubrica',
-    as: 'actividades'
+Persona.hasOne(Usuario, {
+    foreignKey: 'id_persona',
+    as: 'usuario'
 });
+
+// ========== NUEVAS RELACIONES DE EVALUACIÓN ==========
 
 // Rubrica -> RubricaCriterio (una rúbrica tiene muchos criterios)
 Rubrica.hasMany(RubricaCriterio, {
@@ -191,25 +214,6 @@ Entrega.belongsTo(Grupo, {
 });
 Grupo.hasMany(Entrega, {
     foreignKey: 'id_grupo',
-    as: 'entregas'
-});
-
-// ========== RELACIONES DE COMENTARIOS ==========
-
-// Entrega -> Comentario (una entrega puede tener muchos comentarios)
-Entrega.hasMany(Comentario, {
-    foreignKey: 'id_entrega',
-    as: 'comentarios'
-});
-Comentario.belongsTo(Entrega, {
-    foreignKey: 'id_entrega',
-    as: 'entrega'
-});
-
-// ========== RELACIONES DE MATERIALES ==========
-
-// Actividad -> MaterialActividad (una actividad puede tener muchos materiales/documentos)
-Actividad.hasMany(MaterialActividad, {
     foreignKey: 'id_actividad',
     as: 'materiales'
 });
@@ -240,5 +244,8 @@ module.exports = {
     // Modelo de materiales
     MaterialActividad,
     // Modelo de inscripción
-    Inscripcion
+    Inscripcion,
+    // Modelo de usuario (READ ONLY)
+    Usuario,
+    Persona
 };

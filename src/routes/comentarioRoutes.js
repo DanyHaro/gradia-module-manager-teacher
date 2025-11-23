@@ -7,10 +7,9 @@ const authenticate = require('../middlewares/authenticate');
 router.use(authenticate);
 
 // Rutas de comentarios
-router.get('/entrega/:entregaId', comentarioController.getComentariosByEntrega);
-router.get('/:id', comentarioController.getComentarioById);
+// Rutas de comentarios
+router.get('/actividad/:actividadId', comentarioController.getComentariosByActividad);
 router.post('/', comentarioController.createComentario);
-router.put('/:id', comentarioController.updateComentario);
 router.delete('/:id', comentarioController.deleteComentario);
 
 module.exports = router;

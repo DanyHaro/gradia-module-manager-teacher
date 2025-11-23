@@ -1,199 +1,151 @@
-const { Comentario, Entrega } = require('../models/associations');
+const { Comentario, Usuario, Persona } = require('../models/associations');
 
-// Obtener comentarios por entrega
-exports.getComentariosByEntrega = async (req, res) => {
-  try {
-    const { entregaId } = req.params;
+const comentarioController = {
+  // Obtener comentarios de una actividad
+  getComentariosByActividad: async (req, res) => {
+    try {
+      const { actividadId } = req.params;
 
-    const entrega = await Entrega.findByPk(entregaId);
-    if (!entrega) {
-      return res.status(404).json({
+      const comentarios = await Comentario.findAll({
+        where: {
+          id_actividad: actividadId,
+          parent_id: null // Solo comentarios principales, las respuestas se cargan anidadas
+        },
+        include: [
+          {
+            model: Usuario,
+            as: 'usuario',
+            attributes: ['id_usuario', 'correo_institucional'],
+            include: [{
+              model: Persona,
+              as: 'persona',
+              attributes: ['nombre', 'apellido']
+            }]
+          },
+          {
+            model: Comentario,
+            as: 'respuestas',
+            include: [{
+              model: Usuario,
+              as: 'usuario',
+              attributes: ['id_usuario', 'correo_institucional'],
+              include: [{
+                model: Persona,
+                as: 'persona',
+                attributes: ['nombre', 'apellido']
+              }]
+            }],
+            order: [['created_at', 'ASC']] // Respuestas en orden cronológico
+          }
+        ],
+        order: [['created_at', 'DESC']] // Comentarios más recientes primero
+      });
+
+      res.status(200).json({
+        success: true,
+        data: comentarios,
+        message: 'Comentarios obtenidos exitosamente'
+      });
+    } catch (error) {
+      console.error('Error al obtener comentarios:', error);
+      res.status(500).json({
         success: false,
-        message: 'Entrega no encontrada'
+        message: 'Error interno del servidor',
+        error: error.message
       });
     }
+  },
 
-    const comentarios = await Comentario.findAll({
-      where: { id_entrega: entregaId },
-      order: [['fecha_comentario', 'ASC']]
-    });
+  // Crear un comentario
+  createComentario: async (req, res) => {
+    try {
+      const { id_actividad, contenido, parent_id } = req.body;
+      const id_usuario = req.user.id; // Asumiendo que el middleware de auth añade user.id
 
-    res.status(200).json({
-      success: true,
-      data: comentarios,
-      message: 'Comentarios obtenidos exitosamente'
-    });
-  } catch (error) {
-    console.error('Error al obtener comentarios:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
+      if (!id_actividad || !contenido) {
+        return res.status(400).json({
+          success: false,
+          message: 'Faltan campos requeridos (id_actividad, contenido)'
+        });
+      }
+
+      const nuevoComentario = await Comentario.create({
+        id_actividad,
+        id_usuario,
+        contenido,
+        parent_id: parent_id || null,
+        created_at: new Date(),
+        updated_at: new Date()
+      });
+
+      // Devolver el comentario con datos del usuario para actualizar el frontend inmediatamente
+      const comentarioCompleto = await Comentario.findByPk(nuevoComentario.id_comentario, {
+        include: [{
+          model: Usuario,
+          as: 'usuario',
+          attributes: ['id_usuario', 'correo_institucional'],
+          include: [{
+            model: Persona,
+            as: 'persona',
+            attributes: ['nombre', 'apellido']
+          }]
+        }]
+      });
+
+      res.status(201).json({
+        success: true,
+        data: comentarioCompleto,
+        message: 'Comentario creado exitosamente'
+      });
+    } catch (error) {
+      console.error('Error al crear comentario:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message
+      });
+    }
+  },
+
+  // Eliminar un comentario
+  deleteComentario: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const id_usuario = req.user.id;
+
+      const comentario = await Comentario.findByPk(id);
+
+      if (!comentario) {
+        return res.status(404).json({
+          success: false,
+          message: 'Comentario no encontrado'
+        });
+      }
+
+      // Verificar que el usuario sea el autor (o un admin/profesor si se requiere)
+      // Aquí asumimos que solo el autor puede borrar su comentario por ahora
+      if (comentario.id_usuario !== id_usuario) {
+        return res.status(403).json({
+          success: false,
+          message: 'No tienes permiso para eliminar este comentario'
+        });
+      }
+
+      await comentario.destroy();
+
+      res.status(200).json({
+        success: true,
+        message: 'Comentario eliminado exitosamente'
+      });
+    } catch (error) {
+      console.error('Error al eliminar comentario:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Error interno del servidor',
+        error: error.message
+      });
+    }
   }
 };
 
-// Obtener comentario por ID
-exports.getComentarioById = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const comentario = await Comentario.findByPk(id, {
-      include: [
-        {
-          model: Entrega,
-          as: 'entrega',
-          attributes: ['id_entrega', 'id_actividad', 'id_usuario']
-        }
-      ]
-    });
-
-    if (!comentario) {
-      return res.status(404).json({
-        success: false,
-        message: 'Comentario no encontrado'
-      });
-    }
-
-    res.status(200).json({
-      success: true,
-      data: comentario,
-      message: 'Comentario obtenido exitosamente'
-    });
-  } catch (error) {
-    console.error('Error al obtener comentario:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
-  }
-};
-
-// Crear comentario
-exports.createComentario = async (req, res) => {
-  try {
-    const { id_entrega, id_usuario, contenido } = req.body;
-
-    // Validar campos requeridos
-    if (!id_entrega || !id_usuario || !contenido) {
-      return res.status(400).json({
-        success: false,
-        message: 'La entrega, usuario y contenido son obligatorios'
-      });
-    }
-
-    // Verificar que la entrega existe
-    const entrega = await Entrega.findByPk(id_entrega);
-    if (!entrega) {
-      return res.status(404).json({
-        success: false,
-        message: 'Entrega no encontrada'
-      });
-    }
-
-    const nuevoComentario = await Comentario.create({
-      id_entrega,
-      id_usuario,
-      contenido
-    });
-
-    res.status(201).json({
-      success: true,
-      data: nuevoComentario,
-      message: 'Comentario creado exitosamente'
-    });
-  } catch (error) {
-    console.error('Error al crear comentario:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
-  }
-};
-
-// Actualizar comentario
-exports.updateComentario = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { contenido, id_usuario } = req.body;
-
-    const comentario = await Comentario.findByPk(id);
-    if (!comentario) {
-      return res.status(404).json({
-        success: false,
-        message: 'Comentario no encontrado'
-      });
-    }
-
-    // Validar campo requerido
-    if (!contenido) {
-      return res.status(400).json({
-        success: false,
-        message: 'El contenido es obligatorio'
-      });
-    }
-
-    // Verificar que el usuario sea el autor (opcional: puedes validar con id_usuario del req)
-    if (id_usuario && comentario.id_usuario !== id_usuario) {
-      return res.status(403).json({
-        success: false,
-        message: 'No tienes permiso para editar este comentario'
-      });
-    }
-
-    await comentario.update({ contenido });
-
-    res.status(200).json({
-      success: true,
-      data: comentario,
-      message: 'Comentario actualizado exitosamente'
-    });
-  } catch (error) {
-    console.error('Error al actualizar comentario:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
-  }
-};
-
-// Eliminar comentario
-exports.deleteComentario = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { id_usuario } = req.body;
-
-    const comentario = await Comentario.findByPk(id);
-    if (!comentario) {
-      return res.status(404).json({
-        success: false,
-        message: 'Comentario no encontrado'
-      });
-    }
-
-    // Verificar que el usuario sea el autor (opcional: puedes validar con id_usuario del req)
-    if (id_usuario && comentario.id_usuario !== id_usuario) {
-      return res.status(403).json({
-        success: false,
-        message: 'No tienes permiso para eliminar este comentario'
-      });
-    }
-
-    await comentario.destroy();
-
-    res.status(200).json({
-      success: true,
-      message: 'Comentario eliminado exitosamente'
-    });
-  } catch (error) {
-    console.error('Error al eliminar comentario:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Error interno del servidor',
-      error: error.message
-    });
-  }
-};
+module.exports = comentarioController;

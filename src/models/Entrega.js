@@ -36,6 +36,16 @@ const Entrega = sequelize.define('Entrega', {
     defaultValue: 1,
     field: 'num_intento'
   },
+  calificacion: {
+    type: DataTypes.DECIMAL(5, 2),
+    allowNull: true,
+    field: 'calificacion'
+  },
+  retroalimentacion: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+    field: 'retroalimentacion'
+  },
   created_at: {
     type: DataTypes.DATE,
     allowNull: false,

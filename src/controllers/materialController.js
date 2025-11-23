@@ -48,6 +48,8 @@ exports.getMaterialesByActividad = async (req, res) => {
       order: [['created_at', 'DESC']]
     });
 
+    console.log(`[DEBUG] Materiales solicitados para actividad ${actividadId}: ${materiales.length} encontrados.`);
+
     res.status(200).json({
       success: true,
       data: materiales,
@@ -205,6 +207,40 @@ exports.deleteMaterial = async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Error interno del servidor',
+      error: error.message
+    });
+  }
+};
+
+// Subir archivo
+exports.uploadFile = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No se proporcionó ningún archivo'
+      });
+    }
+
+    // Construir la URL del archivo
+    const fileUrl = `${req.protocol}://${req.get('host')}/uploads/materials/${req.file.filename}`;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        filename: req.file.filename,
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        url: fileUrl
+      },
+      message: 'Archivo subido exitosamente'
+    });
+  } catch (error) {
+    console.error('Error al subir archivo:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error al subir el archivo',
       error: error.message
     });
   }
