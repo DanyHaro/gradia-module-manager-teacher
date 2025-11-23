@@ -33,15 +33,22 @@ const Comentario = sequelize.define('Comentario', {
     allowNull: true, // Para respuestas anidadas
     field: 'parent_id'
   },
-  fecha_comentario: {
+  created_at: {
     type: DataTypes.DATE,
-    defaultValue: DataTypes.NOW,
-    field: 'fecha_comentario'
+    allowNull: true,
+    field: 'created_at',
+    defaultValue: DataTypes.NOW
+  },
+  updated_at: {
+    type: DataTypes.DATE,
+    allowNull: true,
+    field: 'updated_at',
+    defaultValue: DataTypes.NOW
   }
 }, {
   tableName: 'comentario',
   schema: 'actividades',
-  timestamps: false
+  timestamps: false // Deshabilitamos timestamps automáticos pero definimos los campos manualmente
 });
 
 module.exports = Comentario;

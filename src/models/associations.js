@@ -214,10 +214,47 @@ Entrega.belongsTo(Grupo, {
 });
 Grupo.hasMany(Entrega, {
     foreignKey: 'id_grupo',
+    as: 'entregas'
+});
+
+// Actividad -> MaterialActividad
+Actividad.hasMany(MaterialActividad, {
     foreignKey: 'id_actividad',
     as: 'materiales'
 });
 MaterialActividad.belongsTo(Actividad, {
+    foreignKey: 'id_actividad',
+    as: 'actividad'
+});
+
+// ========== RELACIONES DE COMENTARIOS ==========
+
+// Comentario -> Usuario (el autor del comentario)
+Comentario.belongsTo(Usuario, {
+    foreignKey: 'id_usuario',
+    as: 'usuario'
+});
+Usuario.hasMany(Comentario, {
+    foreignKey: 'id_usuario',
+    as: 'comentarios'
+});
+
+// Comentario -> Comentario (relación recursiva para respuestas)
+Comentario.hasMany(Comentario, {
+    foreignKey: 'parent_id',
+    as: 'respuestas'
+});
+Comentario.belongsTo(Comentario, {
+    foreignKey: 'parent_id',
+    as: 'comentarioPadre'
+});
+
+// Comentario -> Actividad (comentarios de una actividad)
+Actividad.hasMany(Comentario, {
+    foreignKey: 'id_actividad',
+    as: 'comentarios'
+});
+Comentario.belongsTo(Actividad, {
     foreignKey: 'id_actividad',
     as: 'actividad'
 });

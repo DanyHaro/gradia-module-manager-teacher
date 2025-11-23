@@ -6,32 +6,39 @@ const comentarioController = {
     try {
       const { actividadId } = req.params;
 
+      console.log(`🔍 Obteniendo comentarios para actividad ${actividadId}`);
+
       const comentarios = await Comentario.findAll({
         where: {
-          id_actividad: actividadId,
+          id_actividad: parseInt(actividadId),
           parent_id: null // Solo comentarios principales, las respuestas se cargan anidadas
         },
         include: [
           {
             model: Usuario,
             as: 'usuario',
+            required: false, // LEFT JOIN para no excluir comentarios sin usuario
             attributes: ['id_usuario', 'correo_institucional'],
             include: [{
               model: Persona,
               as: 'persona',
+              required: false, // LEFT JOIN para no excluir usuarios sin persona
               attributes: ['nombre', 'apellido']
             }]
           },
           {
             model: Comentario,
             as: 'respuestas',
+            required: false, // LEFT JOIN para incluir comentarios sin respuestas
             include: [{
               model: Usuario,
               as: 'usuario',
+              required: false,
               attributes: ['id_usuario', 'correo_institucional'],
               include: [{
                 model: Persona,
                 as: 'persona',
+                required: false,
                 attributes: ['nombre', 'apellido']
               }]
             }],
@@ -41,17 +48,21 @@ const comentarioController = {
         order: [['created_at', 'DESC']] // Comentarios más recientes primero
       });
 
+      console.log(`✅ Encontrados ${comentarios.length} comentarios para actividad ${actividadId}`);
+
       res.status(200).json({
         success: true,
         data: comentarios,
         message: 'Comentarios obtenidos exitosamente'
       });
     } catch (error) {
-      console.error('Error al obtener comentarios:', error);
+      console.error('❌ Error al obtener comentarios:', error);
+      console.error('Stack trace:', error.stack);
       res.status(500).json({
         success: false,
         message: 'Error interno del servidor',
-        error: error.message
+        error: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
       });
     }
   },
