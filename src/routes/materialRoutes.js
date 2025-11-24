@@ -4,14 +4,20 @@ const multer = require("multer");
 const materialController = require('../controllers/materialController');
 const authenticate = require('../middlewares/authenticate');
 
-// Multer solo permite .docx
+// Multer: Valida .docx solo si es rúbrica, permite cualquier formato para materiales
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 50 * 1024 * 1024 },
+  limits: { fileSize: 200 * 1024 * 1024 }, // 200MB límite
   fileFilter: (req, file, cb) => {
-    if (!file.originalname.endsWith(".docx")) {
-      return cb(new Error("Solo se permite subir archivos .docx"));
+    const fileName = file.originalname.toLowerCase();
+    const esRubrica = fileName.includes("rubrica") || fileName.includes("rúbrica");
+
+    // Si es rúbrica, validar que sea .docx
+    if (esRubrica && !file.originalname.endsWith(".docx")) {
+      return cb(new Error("Las rúbricas solo se permiten en formato .docx"));
     }
+
+    // Material de apoyo: cualquier formato permitido
     cb(null, true);
   }
 });

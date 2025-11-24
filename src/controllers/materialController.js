@@ -209,7 +209,7 @@ exports.createMaterial = async (req, res) => {
     if (!req.file) {
       return res.status(400).json({
         success: false,
-        message: "Debes subir un archivo .docx",
+        message: "Debes subir un archivo",
       });
     }
 
@@ -228,53 +228,58 @@ exports.createMaterial = async (req, res) => {
       originalName.includes("rubrica") ||
       originalName.includes("rúbrica");
 
-    const tipo = esRubrica ? "rubrica" : "actividad";
     const timestamp = Date.now();
-    const ext = path.extname(req.file.originalname) || ".docx";
+    const ext = path.extname(req.file.originalname) || "";
 
     // 4️⃣ Crear registro inicial (para obtener id_documento_actividad)
     const nuevoMaterial = await MaterialActividad.create({
       id_actividad,
       nombre_documento: req.file.originalname,
-      tipo_documento: ext.replace(".", ""),
+      tipo_documento: ext.replace(".", "") || "unknown",
       url_archivo: "TEMP"
     });
 
-    // 5️⃣ Nombre definitivo del archivo en S3
-    const filenameWord = `rubricas/${tipo}-${nuevoMaterial.id_documento_actividad}-${id_actividad}-${timestamp}${ext}`;
+    // 5️⃣ Determinar carpeta y nombre del archivo en S3
+    const carpeta = esRubrica ? "rubricas" : "materiales";
+    const tipo = esRubrica ? "rubrica" : "material";
+    const filename = `${carpeta}/${tipo}-${nuevoMaterial.id_documento_actividad}-${id_actividad}-${timestamp}${ext}`;
 
-    // Subir Word
+    // 6️⃣ Subir archivo a S3
     await s3.send(new PutObjectCommand({
       Bucket: process.env.AWS_BUCKET,
-      Key: filenameWord,
+      Key: filename,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
     }));
 
-    const wordUrl = `https://${process.env.AWS_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${filenameWord}`;
+    const fileUrl = `https://${process.env.AWS_BUCKET}.s3.${process.env.AWS_REGION}.amazonaws.com/${filename}`;
 
     // =====================================================
     // ===============  SI ES RÚBRICA → JSON ===============
     // =====================================================
-    if (esRubrica) {
-      const { value: textoPlano } = await mammoth.extractRawText({
-        buffer: req.file.buffer,
-      });
+    if (esRubrica && ext === ".docx") {
+      try {
+        const { value: textoPlano } = await mammoth.extractRawText({
+          buffer: req.file.buffer,
+        });
 
-      const jsonRubrica = parseRubricaFromText(textoPlano, id_actividad);
+        const jsonRubrica = parseRubricaFromText(textoPlano, id_actividad);
 
-      const filenameJson = `rubricas/rubrica-${nuevoMaterial.id_documento_actividad}-${id_actividad}-${timestamp}.json`;
+        const filenameJson = `rubricas/rubrica-${nuevoMaterial.id_documento_actividad}-${id_actividad}-${timestamp}.json`;
 
-      await s3.send(new PutObjectCommand({
-        Bucket: process.env.AWS_BUCKET,
-        Key: filenameJson,
-        Body: Buffer.from(JSON.stringify(jsonRubrica, null, 2)),
-        ContentType: "application/json",
-      }));
+        await s3.send(new PutObjectCommand({
+          Bucket: process.env.AWS_BUCKET,
+          Key: filenameJson,
+          Body: Buffer.from(JSON.stringify(jsonRubrica, null, 2)),
+          ContentType: "application/json",
+        }));
+      } catch (err) {
+        console.warn("⚠️ No se pudo procesar la rúbrica a JSON:", err.message);
+      }
     }
 
-    // 6️⃣ Actualizamos la URL final del Word en la BD
-    await nuevoMaterial.update({ url_archivo: wordUrl });
+    // 7️⃣ Actualizamos la URL final del archivo en la BD
+    await nuevoMaterial.update({ url_archivo: fileUrl });
 
     return res.status(201).json({
       success: true,
