@@ -2,7 +2,7 @@
 // Prueba unitaria para el middleware de autenticación
 
 const jwt = require('jsonwebtoken');
-const authenticate = require('../../src/middlewares/authenticate');
+const authenticate = require('../../../src/middlewares/authenticate');
 
 // Mock de request, response y next
 const mockRequest = (authHeader) => ({
