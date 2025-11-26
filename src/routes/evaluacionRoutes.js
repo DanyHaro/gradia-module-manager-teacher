@@ -11,6 +11,7 @@ router.use(authenticate);
 router.get('/', evaluacionController.getAllEvaluaciones);
 router.get('/entrega/:entregaId', evaluacionController.getEvaluacionesByEntrega);
 router.get('/estadisticas', evaluacionController.getEstadisticasEvaluaciones);
+router.get('/retroalimentacion/:entregaId', evaluacionController.getRetroalimentacionByEntrega);
 router.get('/:id', evaluacionController.getEvaluacionById);
 router.post('/', evaluacionController.createEvaluacion);
 router.put('/:id', evaluacionController.updateEvaluacion);

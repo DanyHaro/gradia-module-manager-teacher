@@ -510,6 +510,78 @@ const evaluacionController = {
                 error: error.message
             });
         }
+    },
+
+    // Obtener retroalimentación detallada desde Elasticsearch
+    getRetroalimentacionByEntrega: async (req, res) => {
+        try {
+            const { entregaId } = req.params;
+
+            // Verificar que la entrega existe
+            const entrega = await Entrega.findByPk(entregaId);
+
+            if (!entrega) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Entrega no encontrada'
+                });
+            }
+
+            // Importar el cliente de Elasticsearch
+            const { es } = require('../config/elasticsearch');
+
+            // Convertir entregaId a número si es necesario
+            const entregaIdValue = isNaN(Number(entregaId))
+                ? entregaId
+                : Number(entregaId);
+
+            // Buscar evaluación en Elasticsearch
+            const result = await es.search({
+                index: "evaluaciones_rubrica",
+                _source_includes: ["evaluacion"],
+                query: {
+                    term: { entrega_id: entregaIdValue }
+                }
+            });
+
+            const hit = result.hits.hits[0]?._source;
+
+            if (!hit) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Evaluación no encontrada en Elasticsearch'
+                });
+            }
+
+            // Estructurar la respuesta
+            const response = {
+                notas_por_criterio: hit.evaluacion.notas_por_criterio,
+
+                retroalimentaciones_por_criterio: Object.fromEntries(
+                    Object.entries(hit.evaluacion.criterios).map(
+                        ([k, v]) => [k, v.justificacion]
+                    )
+                ),
+
+                retroalimentacion_final: hit.evaluacion.retroalimentacion_global,
+
+                nota_final: hit.evaluacion.nota_final
+            };
+
+            res.status(200).json({
+                success: true,
+                data: response,
+                message: 'Retroalimentación obtenida exitosamente'
+            });
+
+        } catch (error) {
+            console.error('Error al obtener retroalimentación desde Elasticsearch:', error);
+            res.status(500).json({
+                success: false,
+                message: 'Error interno del servidor',
+                error: error.message
+            });
+        }
     }
 };
 

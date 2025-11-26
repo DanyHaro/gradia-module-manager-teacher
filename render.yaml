@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: gradia-teacher-api
+    env: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: JWT_SECRET
+        sync: false  # Configurar manualmente en Render Dashboard
+      - key: AUTH_SERVICE_URL
+        sync: false  # URL del servicio auth de tu colega
+      - key: FRONTEND_URL
+        sync: false  # URL de Vercel
+      - key: DB_HOST
+        sync: false
+      - key: DB_PORT
+        value: 5432
+      - key: DB_NAME
+        sync: false
+      - key: DB_USER
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: AWS_REGION
+        sync: false
+      - key: AWS_ACCESS_KEY
+        sync: false
+      - key: AWS_SECRET_KEY
+        sync: false
+      - key: AWS_BUCKET_NAME
+        sync: false
