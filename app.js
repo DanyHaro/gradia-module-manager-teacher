@@ -29,9 +29,31 @@ const materialRoutes = require('./src/routes/materialRoutes');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuración de CORS para permitir credenciales
+// Configuración de CORS mejorada para permitir Vercel + desarrollo local
 const corsOptions = {
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Permitir requests sin origin (ej: Postman, mobile apps)
+    if (!origin) return callback(null, true);
+
+    // Lista de orígenes locales permitidos
+    const allowedOrigins = [
+      'http://localhost:3000',
+      'http://127.0.0.1:3000',
+    ];
+
+    // Permitir todos los dominios de Vercel
+    const isVercel = origin.endsWith('.vercel.app');
+
+    // Permitir el dominio de producción específico (si está configurado)
+    const isProduction = origin === process.env.FRONTEND_URL;
+
+    if (allowedOrigins.includes(origin) || isVercel || isProduction) {
+      return callback(null, true);
+    }
+
+    console.log('❌ ORIGEN BLOQUEADO POR CORS:', origin);
+    return callback(new Error('CORS_NOT_ALLOWED'), false);
+  },
   credentials: true, // Permitir cookies y headers de autenticación
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
